@@ -1,4 +1,3 @@
-
 <?php
 // pages/bahan_baku.php
 // Halaman manajemen data bahan baku (CRUD) dengan pagination dan pencarian
@@ -186,7 +185,18 @@ function buildPaginationUrl($baseUrl, $paramsToUpdate) {
 
                 <!-- Form Tambah/Edit Bahan Baku/Kemasan -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-2" id="form-title">Tambah Bahan Baku/Kemasan Baru</h2>
+                    <div class="flex items-center mb-6">
+                        <div class="p-2 bg-blue-100 rounded-lg mr-3">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-800" id="form-title">Tambah Bahan Baku/Kemasan Baru</h2>
+                            <p class="text-sm text-gray-600 mt-1">Isi detail bahan baku atau kemasan baru Anda atau gunakan form ini untuk mengedit yang sudah ada.</p>
+                        </div>
+                    </div>
+                    
                     <p class="text-sm text-gray-600 mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
                         <svg class="w-4 h-4 inline mr-1 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>

@@ -230,7 +230,7 @@ if (isset($_SESSION['transaction_message'])) {
                         </div>
 
                         <!-- Filter Form -->
-                        <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="bg-gray-50 rounded-lg p-4" id="filter-section">
                             <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                                 <input type="hidden" name="type" value="<?php echo htmlspecialchars($type); ?>">
 
@@ -243,7 +243,7 @@ if (isset($_SESSION['transaction_message'])) {
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                             </svg>
                                         </div>
-                                        <input type="text" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" 
+                                        <input type="text" id="search-input" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" 
                                                placeholder="Cari deskripsi atau jumlah..." 
                                                class="pl-10 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                                     </div>
@@ -271,16 +271,16 @@ if (isset($_SESSION['transaction_message'])) {
                                     </select>
                                 </div>
 
-                                <!-- Action Buttons -->
-                                <div class="flex gap-3">
-                                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <!-- Action Buttons - Ukuran diperkecil -->
+                                <div class="flex gap-2">
+                                    <button type="submit" class="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 text-sm font-medium">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                                         </svg>
                                         Filter
                                     </button>
-                                    <button type="button" onclick="resetFilter()" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <button type="button" onclick="resetFilter()" class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                         </svg>
                                         Reset
@@ -450,5 +450,46 @@ if (isset($_SESSION['transaction_message'])) {
 </div>
 
 <script src="/cornerbites-sia/assets/js/transaksi.js"></script>
+
+<!-- Script untuk mengatasi masalah scroll saat realtime search -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    let searchTimeout;
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const searchValue = this.value;
+            
+            // Simpan posisi scroll saat ini
+            const currentScrollPosition = window.pageYOffset;
+            
+            searchTimeout = setTimeout(() => {
+                // Simpan posisi scroll ke sessionStorage sebelum redirect
+                sessionStorage.setItem('scrollPosition', currentScrollPosition);
+                
+                // Buat URL baru dengan parameter search
+                const currentUrl = new URL(window.location);
+                currentUrl.searchParams.set('search', searchValue);
+                currentUrl.searchParams.set('page', '1'); // Reset ke halaman 1
+                
+                // Redirect ke URL baru
+                window.location.href = currentUrl.toString();
+            }, 500);
+        });
+    }
+    
+    // Restore posisi scroll setelah page load
+    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+    if (savedScrollPosition) {
+        // Tunggu sebentar agar halaman fully loaded
+        setTimeout(() => {
+            window.scrollTo(0, parseInt(savedScrollPosition));
+            sessionStorage.removeItem('scrollPosition');
+        }, 100);
+    }
+});
+</script>
 
 <?php include_once __DIR__ . '/../includes/footer.php'; ?>
