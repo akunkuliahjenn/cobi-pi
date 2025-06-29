@@ -231,20 +231,20 @@ if (isset($_SESSION['transaction_message'])) {
 
                         <!-- Filter Form -->
                         <div class="bg-gray-50 rounded-lg p-4" id="filter-section">
-                            <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                <input type="hidden" name="type" value="<?php echo htmlspecialchars($type); ?>">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <input type="hidden" id="current-type" value="<?php echo htmlspecialchars($type); ?>">
 
                                 <!-- Pencarian -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Pencarian</label>
                                     <div class="relative">
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                             </svg>
                                         </div>
-                                        <input type="text" id="search-input" name="search" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" 
-                                               placeholder="Cari deskripsi atau jumlah..." 
+                                        <input type="text" id="search-input" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>" 
+                                               placeholder="Cari nama produk..." 
                                                class="pl-10 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                                     </div>
                                 </div>
@@ -252,7 +252,7 @@ if (isset($_SESSION['transaction_message'])) {
                                 <!-- Filter Tanggal -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Filter Tanggal</label>
-                                    <select name="date_filter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                                    <select id="date-filter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                                         <option value="semua" <?php echo ($_GET['date_filter'] ?? '') == 'semua' ? 'selected' : ''; ?>>Semua Periode</option>
                                         <option value="hari_ini" <?php echo ($_GET['date_filter'] ?? '') == 'hari_ini' ? 'selected' : ''; ?>>Hari Ini</option>
                                         <option value="bulan_ini" <?php echo ($_GET['date_filter'] ?? '') == 'bulan_ini' ? 'selected' : ''; ?>>Bulan Ini</option>
@@ -263,185 +263,188 @@ if (isset($_SESSION['transaction_message'])) {
                                 <!-- Per Halaman -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Per Halaman</label>
-                                    <select name="limit" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
-                                        <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10 Data</option>
-                                        <option value="25" <?php echo $limit == 25 ? 'selected' : ''; ?>>25 Data</option>
-                                        <option value="50" <?php echo $limit == 50 ? 'selected' : ''; ?>>50 Data</option>
-                                        <option value="100" <?php echo $limit == 100 ? 'selected' : ''; ?>>100 Data</option>
+                                    <select id="limit-select" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                                        <option value="10" <?php echo $limit == 10 ? 'selected' : ''; ?>>10</option>
+                                        <option value="25" <?php echo $limit == 25 ? 'selected' : ''; ?>>25</option>
+                                        <option value="50" <?php echo $limit == 50 ? 'selected' : ''; ?>>50</option>
+                                        <option value="100" <?php echo $limit == 100 ? 'selected' : ''; ?>>100</option>
                                     </select>
                                 </div>
 
-                                <!-- Action Buttons - Ukuran diperkecil -->
+                                <!-- Action Buttons - Ukuran diperkecil sesuai screenshot -->
                                 <div class="flex gap-2">
-                                    <button type="submit" class="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 text-sm font-medium">
+                                    <button type="button" id="filter-btn" class="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 text-sm font-medium">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                                         </svg>
                                         Filter
                                     </button>
-                                    <button type="button" onclick="resetFilter()" class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200">
+                                    <button type="button" id="reset-btn" class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition duration-200">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                         </svg>
                                         Reset
                                     </button>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal & Waktu</th>
-                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
-                                        <?php if ($type == 'pemasukan'): ?>
-                                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produk</th>
-                                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Unit</th>
-                                        <?php endif; ?>
-                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah (Rp)</th>
-                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
-                                    <?php if (!empty($transactions)): ?>
-                                        <?php foreach ($transactions as $transaction): ?>
-                                            <tr class="hover:bg-gray-50 transition duration-150">
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <div class="flex flex-col">
-                                                        <div class="text-sm font-medium text-gray-900"><?php echo date('d/m/Y', strtotime($transaction['date'])); ?></div>
-                                                        <div class="text-xs text-gray-500">
-                                                            <?php echo $transaction['created_at'] ? date('H:i:s', strtotime($transaction['created_at'])) : 'N/A'; ?>
+                    <!-- Container untuk hasil pencarian -->
+                    <div id="transactions-container">
+                        <div class="overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal & Waktu</th>
+                                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi</th>
+                                            <?php if ($type == 'pemasukan'): ?>
+                                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produk</th>
+                                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah Unit</th>
+                                            <?php endif; ?>
+                                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah (Rp)</th>
+                                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <?php if (!empty($transactions)): ?>
+                                            <?php foreach ($transactions as $transaction): ?>
+                                                <tr class="hover:bg-gray-50 transition duration-150">
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <div class="flex flex-col">
+                                                            <div class="text-sm font-medium text-gray-900"><?php echo date('d/m/Y', strtotime($transaction['date'])); ?></div>
+                                                            <div class="text-xs text-gray-500">
+                                                                <?php echo $transaction['created_at'] ? date('H:i:s', strtotime($transaction['created_at'])) : 'N/A'; ?>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </td>
-                                                <td class="px-6 py-4">
-                                                    <div class="text-sm text-gray-900 max-w-xs truncate" title="<?php echo htmlspecialchars($transaction['description']); ?>">
-                                                        <?php echo htmlspecialchars($transaction['description']); ?>
-                                                    </div>
-                                                </td>
-                                                <?php if ($type == 'pemasukan'): ?>
-                                                    <td class="px-6 py-4 whitespace-nowrap">
-                                                        <div class="text-sm text-gray-900"><?php echo htmlspecialchars($transaction['product_name'] ?? '-'); ?></div>
                                                     </td>
-                                                    <td class="px-6 py-4 whitespace-nowrap">
-                                                        <div class="text-sm text-gray-900"><?php echo htmlspecialchars($transaction['quantity'] ?? '-'); ?></div>
+                                                    <td class="px-6 py-4">
+                                                        <div class="text-sm text-gray-900 max-w-xs truncate" title="<?php echo htmlspecialchars($transaction['description']); ?>">
+                                                            <?php echo htmlspecialchars($transaction['description']); ?>
+                                                        </div>
                                                     </td>
-                                                <?php endif; ?>
-                                                <td class="px-6 py-4 whitespace-nowrap">
-                                                    <div class="text-sm font-semibold <?php echo $type == 'pemasukan' ? 'text-green-600' : 'text-red-600'; ?>">
-                                                        Rp <?php echo number_format($transaction['amount'], 0, ',', '.'); ?>
-                                                    </div>
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                    <div class="flex items-center space-x-2">
-                                                        <button onclick="editTransaction(<?php echo htmlspecialchars(json_encode($transaction)); ?>, <?php echo htmlspecialchars(json_encode($products)); ?>)" 
-                                                                class="inline-flex items-center px-3 py-1 border border-indigo-300 text-xs font-medium rounded-md text-indigo-700 bg-indigo-50 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200">
-                                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                                            </svg>
-                                                            Edit
-                                                        </button>
-                                                        <a href="/cornerbites-sia/process/simpan_transaksi.php?action=delete&id=<?php echo htmlspecialchars($transaction['id']); ?>&type=<?php echo htmlspecialchars($type); ?>" 
-                                                           class="inline-flex items-center px-3 py-1 border border-red-300 text-xs font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-200" 
-                                                           onclick="return confirm('Apakah Anda yakin ingin menghapus transaksi ini?');">
-                                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                            </svg>
-                                                            Hapus
-                                                        </a>
+                                                    <?php if ($type == 'pemasukan'): ?>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="text-sm text-gray-900"><?php echo htmlspecialchars($transaction['product_name'] ?? '-'); ?></div>
+                                                        </td>
+                                                        <td class="px-6 py-4 whitespace-nowrap">
+                                                            <div class="text-sm text-gray-900"><?php echo htmlspecialchars($transaction['quantity'] ?? '-'); ?></div>
+                                                        </td>
+                                                    <?php endif; ?>
+                                                    <td class="px-6 py-4 whitespace-nowrap">
+                                                        <div class="text-sm font-semibold <?php echo $type == 'pemasukan' ? 'text-green-600' : 'text-red-600'; ?>">
+                                                            Rp <?php echo number_format($transaction['amount'], 0, ',', '.'); ?>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                        <div class="flex items-center space-x-2">
+                                                            <button onclick="editTransaction(<?php echo htmlspecialchars(json_encode($transaction)); ?>, <?php echo htmlspecialchars(json_encode($products)); ?>)" 
+                                                                    class="inline-flex items-center px-3 py-1 border border-indigo-300 text-xs font-medium rounded-md text-indigo-700 bg-indigo-50 hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200">
+                                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                                </svg>
+                                                                Edit
+                                                            </button>
+                                                            <a href="/cornerbites-sia/process/simpan_transaksi.php?action=delete&id=<?php echo htmlspecialchars($transaction['id']); ?>&type=<?php echo htmlspecialchars($type); ?>" 
+                                                               class="inline-flex items-center px-3 py-1 border border-red-300 text-xs font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-200" 
+                                                               onclick="return confirm('Apakah Anda yakin ingin menghapus transaksi ini?');">
+                                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                                </svg>
+                                                                Hapus
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="<?php echo ($type == 'pemasukan' ? '6' : '4'); ?>" class="px-6 py-12 text-center">
+                                                    <div class="flex flex-col items-center">
+                                                        <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                        </svg>
+                                                        <p class="text-gray-500 text-lg font-medium">Belum ada transaksi <?php echo ($type == 'pemasukan' ? 'penjualan' : 'pengeluaran'); ?></p>
+                                                        <p class="text-gray-400 text-sm mt-1">Mulai catat transaksi pertama Anda menggunakan form di atas</p>
                                                     </div>
                                                 </td>
                                             </tr>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <tr>
-                                            <td colspan="<?php echo ($type == 'pemasukan' ? '6' : '4'); ?>" class="px-6 py-12 text-center">
-                                                <div class="flex flex-col items-center">
-                                                    <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                                    </svg>
-                                                    <p class="text-gray-500 text-lg font-medium">Belum ada transaksi <?php echo ($type == 'pemasukan' ? 'penjualan' : 'pengeluaran'); ?></p>
-                                                    <p class="text-gray-400 text-sm mt-1">Mulai catat transaksi pertama Anda menggunakan form di atas</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
 
-                        <!-- Pagination -->
-                        <?php if ($totalPages > 1): ?>
-                        <div class="bg-white px-6 py-4 border-t border-gray-200">
-                            <div class="flex items-center justify-between">
-                                <div class="flex-1 flex justify-between sm:hidden">
-                                    <?php if ($page > 1): ?>
-                                        <a href="?<?php echo http_build_query(array_merge(array_filter(['type' => $type, 'limit' => $limit, 'search' => $search, 'date_filter' => $date_filter]), ['page' => $page - 1])); ?>" 
-                                           class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</a>
-                                    <?php endif; ?>
-                                    <?php if ($page < $totalPages): ?>
-                                        <a href="?<?php echo http_build_query(array_merge(array_filter(['type' => $type, 'limit' => $limit, 'search' => $search, 'date_filter' => $date_filter]), ['page' => $page + 1])); ?>" 
-                                           class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</a>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                                    <div>
-                                        <p class="text-sm text-gray-700">
-                                            Menampilkan <span class="font-medium"><?php echo number_format($offset + 1); ?></span> sampai 
-                                            <span class="font-medium"><?php echo number_format(min($offset + $limit, $totalTransactions)); ?></span> dari 
-                                            <span class="font-medium"><?php echo number_format($totalTransactions); ?></span> transaksi
-                                        </p>
+                            <!-- Pagination -->
+                            <?php if ($totalPages > 1): ?>
+                            <div class="bg-white px-6 py-4 border-t border-gray-200">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1 flex justify-between sm:hidden">
+                                        <?php if ($page > 1): ?>
+                                            <a href="?<?php echo http_build_query(array_merge(array_filter(['type' => $type, 'limit' => $limit, 'search' => $search, 'date_filter' => $date_filter]), ['page' => $page - 1])); ?>" 
+                                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</a>
+                                        <?php endif; ?>
+                                        <?php if ($page < $totalPages): ?>
+                                            <a href="?<?php echo http_build_query(array_merge(array_filter(['type' => $type, 'limit' => $limit, 'search' => $search, 'date_filter' => $date_filter]), ['page' => $page + 1])); ?>" 
+                                               class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</a>
+                                        <?php endif; ?>
                                     </div>
-                                    <div>
-                                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                                            <?php 
-                                            $current_params = array_filter([
-                                                'type' => $type,
-                                                'limit' => $limit,
-                                                'search' => $search,
-                                                'date_filter' => $date_filter
-                                            ]);
-                                            ?>
+                                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                                        <div>
+                                            <p class="text-sm text-gray-700">
+                                                Menampilkan <span class="font-medium"><?php echo number_format($offset + 1); ?></span> sampai 
+                                                <span class="font-medium"><?php echo number_format(min($offset + $limit, $totalTransactions)); ?></span> dari 
+                                                <span class="font-medium"><?php echo number_format($totalTransactions); ?></span> transaksi
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                                <?php 
+                                                $current_params = array_filter([
+                                                    'type' => $type,
+                                                    'limit' => $limit,
+                                                    'search' => $search,
+                                                    'date_filter' => $date_filter
+                                                ]);
+                                                ?>
 
-                                            <?php if ($page > 1): ?>
-                                                <a href="?<?php echo http_build_query(array_merge($current_params, ['page' => $page - 1])); ?>" 
-                                                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                                    <span class="sr-only">Previous</span>
-                                                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </a>
-                                            <?php endif; ?>
+                                                <?php if ($page > 1): ?>
+                                                    <a href="?<?php echo http_build_query(array_merge($current_params, ['page' => $page - 1])); ?>" 
+                                                       class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                                        <span class="sr-only">Previous</span>
+                                                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </a>
+                                                <?php endif; ?>
 
-                                            <?php 
-                                            $startPage = max(1, $page - 2);
-                                            $endPage = min($totalPages, $page + 2);
-                                            for ($i = $startPage; $i <= $endPage; $i++): 
-                                            ?>
-                                                <a href="?<?php echo http_build_query(array_merge($current_params, ['page' => $i])); ?>" 
-                                                   class="relative inline-flex items-center px-4 py-2 border text-sm font-medium <?php echo ($i == $page) ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'border-gray-300 bg-white text-gray-500 hover:bg-gray-50'; ?>">
-                                                    <?php echo $i; ?>
-                                                </a>
-                                            <?php endfor; ?>
+                                                <?php 
+                                                $startPage = max(1, $page - 2);
+                                                $endPage = min($totalPages, $page + 2);
+                                                for ($i = $startPage; $i <= $endPage; $i++): 
+                                                ?>
+                                                    <a href="?<?php echo http_build_query(array_merge($current_params, ['page' => $i])); ?>" 
+                                                       class="relative inline-flex items-center px-4 py-2 border text-sm font-medium <?php echo ($i == $page) ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'border-gray-300 bg-white text-gray-500 hover:bg-gray-50'; ?>">
+                                                        <?php echo $i; ?>
+                                                    </a>
+                                                <?php endfor; ?>
 
-                                            <?php if ($page < $totalPages): ?>
-                                                <a href="?<?php echo http_build_query(array_merge($current_params, ['page' => $page + 1])); ?>" 
-                                                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                                    <span class="sr-only">Next</span>
-                                                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </a>
-                                            <?php endif; ?>
-                                        </nav>
+                                                <?php if ($page < $totalPages): ?>
+                                                    <a href="?<?php echo http_build_query(array_merge($current_params, ['page' => $page + 1])); ?>" 
+                                                       class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                                        <span class="sr-only">Next</span>
+                                                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </a>
+                                                <?php endif; ?>
+                                            </nav>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            <?php endif; ?>
                         </div>
-                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -451,43 +454,95 @@ if (isset($_SESSION['transaction_message'])) {
 
 <script src="/cornerbites-sia/assets/js/transaksi.js"></script>
 
-<!-- Script untuk mengatasi masalah scroll saat realtime search -->
+<!-- Script untuk AJAX search tanpa reload halaman -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('search-input');
-    let searchTimeout;
+    const dateFilter = document.getElementById('date-filter');
+    const limitSelect = document.getElementById('limit-select');
+    const filterBtn = document.getElementById('filter-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const currentType = document.getElementById('current-type').value;
     
+    let searchTimeout;
+
+    // Function untuk melakukan AJAX request
+    function performSearch() {
+        const searchValue = searchInput.value;
+        const dateValue = dateFilter.value;
+        const limitValue = limitSelect.value;
+        
+        // Buat URL untuk AJAX request
+        const params = new URLSearchParams({
+            type: currentType,
+            search: searchValue,
+            date_filter: dateValue,
+            limit: limitValue,
+            ajax: '1' // Flag untuk menandakan ini AJAX request
+        });
+        
+        // Tampilkan loading indicator
+        const container = document.getElementById('transactions-container');
+        container.innerHTML = '<div class="flex justify-center items-center py-12"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div><span class="ml-2 text-gray-600">Mencari...</span></div>';
+        
+        // Lakukan AJAX request
+        fetch(`/cornerbites-sia/pages/transaksi.php?${params.toString()}`)
+            .then(response => response.text())
+            .then(html => {
+                // Parse HTML response dan ambil bagian tabel
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContainer = doc.getElementById('transactions-container');
+                
+                if (newContainer) {
+                    container.innerHTML = newContainer.innerHTML;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                container.innerHTML = '<div class="text-center py-12 text-red-600">Terjadi kesalahan saat mencari data.</div>';
+            });
+    }
+
+    // Real-time search dengan debouncing
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
-            const searchValue = this.value;
-            
-            // Simpan posisi scroll saat ini
-            const currentScrollPosition = window.pageYOffset;
-            
             searchTimeout = setTimeout(() => {
-                // Simpan posisi scroll ke sessionStorage sebelum redirect
-                sessionStorage.setItem('scrollPosition', currentScrollPosition);
-                
-                // Buat URL baru dengan parameter search
-                const currentUrl = new URL(window.location);
-                currentUrl.searchParams.set('search', searchValue);
-                currentUrl.searchParams.set('page', '1'); // Reset ke halaman 1
-                
-                // Redirect ke URL baru
-                window.location.href = currentUrl.toString();
+                performSearch();
             }, 500);
         });
     }
-    
-    // Restore posisi scroll setelah page load
-    const savedScrollPosition = sessionStorage.getItem('scrollPosition');
-    if (savedScrollPosition) {
-        // Tunggu sebentar agar halaman fully loaded
-        setTimeout(() => {
-            window.scrollTo(0, parseInt(savedScrollPosition));
-            sessionStorage.removeItem('scrollPosition');
-        }, 100);
+
+    // Filter button
+    if (filterBtn) {
+        filterBtn.addEventListener('click', function() {
+            performSearch();
+        });
+    }
+
+    // Date filter change
+    if (dateFilter) {
+        dateFilter.addEventListener('change', function() {
+            performSearch();
+        });
+    }
+
+    // Limit select change
+    if (limitSelect) {
+        limitSelect.addEventListener('change', function() {
+            performSearch();
+        });
+    }
+
+    // Reset button
+    if (resetBtn) {
+        resetBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            dateFilter.value = 'semua';
+            limitSelect.value = '10';
+            performSearch();
+        });
     }
 });
 </script>
