@@ -607,3 +607,4 @@ function buildPaginationUrl($baseUrl, $paramsToUpdate) {
 <script src="../assets/js/bahan_baku.js"></script>
 
 <?php include_once __DIR__ . '/../includes/footer.php'; ?>
+
